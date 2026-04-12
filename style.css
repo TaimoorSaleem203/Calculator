@@ -1,0 +1,275 @@
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+ 
+    :root {
+      --bg:          #0d0d0f;
+      --surface:     #16161a;
+      --surface-2:   #1e1e24;
+      --surface-3:   #26262f;
+      --border:      rgba(255,255,255,0.07);
+      --border-md:   rgba(255,255,255,0.12);
+      --text:        #f0eff4;
+      --text-muted:  #7a7a8c;
+      --text-dim:    #3e3e50;
+      --accent:      #6c63ff;
+      --accent-dark: #4c44cc;
+      --accent-glow: rgba(108, 99, 255, 0.35);
+      --eq-text:     #fff;
+      --fn-text:     #9d9db8;
+      --op-bg:       #1a1a2e;
+      --op-border:   rgba(108,99,255,0.3);
+      --op-text:     #9d93ff;
+    }
+ 
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+ 
+    /* animated background dots */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(108,99,255,0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(99,160,255,0.06) 0%, transparent 50%);
+      pointer-events: none;
+    }
+ 
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
+      pointer-events: none;
+    }
+ 
+    .calc-wrap {
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+ 
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+ 
+    .label {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+ 
+    .calc {
+      width: 340px;
+      background: var(--surface);
+      border: 1px solid var(--border-md);
+      border-radius: 28px;
+      padding: 1.4rem 1.4rem 1.7rem;
+      box-shadow:
+        0 0 0 1px rgba(108,99,255,0.06),
+        0 24px 60px rgba(0,0,0,0.6),
+        0 0 80px rgba(108,99,255,0.04);
+    }
+ 
+    /* DISPLAY */
+    .display {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.1rem 1.3rem 1rem;
+      margin-bottom: 1.3rem;
+      min-height: 98px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      overflow: hidden;
+      position: relative;
+    }
+ 
+    .display::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(108,99,255,0.4), transparent);
+    }
+ 
+    .display-expr {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      min-height: 18px;
+      text-align: right;
+      word-break: break-all;
+      line-height: 1.4;
+      letter-spacing: 0.5px;
+      transition: opacity 0.2s;
+    }
+ 
+    .display-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 42px;
+      font-weight: 300;
+      color: var(--text);
+      text-align: right;
+      word-break: break-all;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-top: 4px;
+      transition: transform 0.08s ease, color 0.2s;
+    }
+ 
+    .display-val.pop {
+      transform: scale(1.05);
+      color: #fff;
+    }
+ 
+    /* GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 9px;
+    }
+ 
+    /* BUTTONS */
+    .btn {
+      position: relative;
+      overflow: hidden;
+      height: 66px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface-3);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s, border-color 0.12s, transform 0.08s, box-shadow 0.12s;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+ 
+    .btn:hover {
+      background: #2a2a35;
+      border-color: var(--border-md);
+    }
+ 
+    .btn:active {
+      transform: scale(0.91);
+      background: #303040;
+    }
+ 
+    /* operator buttons */
+    .btn.op {
+      background: var(--op-bg);
+      border-color: var(--op-border);
+      color: var(--op-text);
+      font-size: 22px;
+    }
+ 
+    .btn.op:hover {
+      background: #20203a;
+      border-color: rgba(108,99,255,0.5);
+      box-shadow: 0 0 12px rgba(108,99,255,0.15);
+    }
+ 
+    /* equals button */
+    .btn.eq {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--eq-text);
+      font-size: 22px;
+      font-weight: 500;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+ 
+    .btn.eq:hover {
+      background: #7b73ff;
+      border-color: #7b73ff;
+      box-shadow: 0 0 28px rgba(108,99,255,0.5);
+    }
+ 
+    .btn.eq:active {
+      background: var(--accent-dark);
+      box-shadow: 0 0 10px rgba(108,99,255,0.2);
+    }
+ 
+    /* function buttons (AC, +/-, %) */
+    .btn.fn {
+      background: var(--surface-2);
+      border-color: var(--border-md);
+      color: var(--fn-text);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+ 
+    .btn.fn:hover {
+      background: #22222e;
+      color: var(--text);
+    }
+ 
+    /* zero spans 2 cols */
+    .btn.span2 {
+      grid-column: span 2;
+      justify-content: flex-start;
+      padding-left: 22px;
+    }
+ 
+    /* ripple */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      width: 70px;
+      height: 70px;
+      background: rgba(255,255,255,0.08);
+      transform: scale(0);
+      animation: rip 0.4s linear forwards;
+      pointer-events: none;
+    }
+ 
+    .btn.eq .ripple { background: rgba(255,255,255,0.2); }
+    .btn.op .ripple { background: rgba(108,99,255,0.25); }
+ 
+    @keyframes rip {
+      to { transform: scale(4); opacity: 0; }
+    }
+ 
+    /* keyboard hint */
+    .hint {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+ 
+    /* responsive */
+    @media (max-width: 380px) {
+      .calc { width: 95vw; padding: 1rem 1rem 1.3rem; }
+      .btn { height: 58px; font-size: 16px; }
+      .display-val { font-size: 34px; }
+    }

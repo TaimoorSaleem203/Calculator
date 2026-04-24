@@ -1,80 +1,82 @@
-const btns = document.querySelectorAll(".btn");
-const input = document.querySelector("#val");
+const buttons = document.querySelectorAll(".btn");
+const input = document.querySelector(".display-val");
 
-let prevDigit = null; let result = null; let currDigit = null
-let digit = []; let lastOp = -1
+let currentValue = "0";
+let previousValue = null;
+let operator = null;
+let waitingForNextValue = false;
 
-btns.forEach((btn) => {
+function calculate(prev, curr, op) {
+    const a = parseFloat(prev);
+    const b = parseFloat(curr);
+    if (isNaN(a) || isNaN(b)) return "Error";
+
+    switch (op) {
+        case "+": return a + b;
+        case "-": return a - b;
+        case "/": return b === 0 ? "Infinity" : a / b;
+        case "*": return a * b;
+        default: return b;
+    }
+}
+
+buttons.forEach(btn => {
     btn.addEventListener("click", (e) => {
+        const value = e.target.textContent;
 
-        try {
-            let target = e.target
-            let value = target.textContent
-
-            if (value == "AC") {
-
-                input.textContent = "0"
-                digit = []
-                prevDigit = null
-                currDigit = null
-                return
-
+        if (!isNaN(value)) {
+            if (currentValue === "0" || waitingForNextValue) {
+                currentValue = value; 
+                waitingForNextValue = false;
+            } else {
+                currentValue += value;
             }
-            else if (value == "+/−") {
+        } 
+        
+        else if (["+", "-", "×", "÷"].includes(value)) {
+            const opMap = { "×": "*", "÷": "/" };
+            const opSymbol = opMap[value] || value;
 
-                let num = digit.join("")
-
-                if (num.length == 1 || num.length == 2) {
-                    if (num.startsWith("-")) {
-                        num = "+" + (num.slice(1))
-                    } else {
-                        num = "-" + num
-                    }
-                } else {
-                    num = num.slice(0, num.length - 2) + (
-                        num.slice(num.length - 2).startsWith("+")
-                            ? `-${num.slice(num.length - 1)}`
-                            : `+${num.slice(num.length - 1)}`
-                    );
-                }
-
-                digit = []
-                digit.push(num)
-                input.textContent = num
-
+            if (operator && !waitingForNextValue) {
+                currentValue = calculate(previousValue, currentValue, operator).toString();
             }
-            else if (value == "=") {
-
-                let finalExpression = digit.join("")
-                    .replace(/×/g, "*")
-                    .replace(/÷/g, "/")
-                    .replace(/−/g, "-")
-
-                result = eval(finalExpression)
-                input.textContent = result
-
-                prevDigit = result
-                digit = []
-
+        
+            previousValue = currentValue;     
+            operator = opSymbol;
+            waitingForNextValue = true; 
+        } 
+        
+        else if (value === "=") {
+            if (operator) {
+                currentValue = calculate(previousValue, currentValue, operator).toString();
+                previousValue = null;
+                operator = null;
+                waitingForNextValue = true;
             }
-            else {
-                if (prevDigit != null && isNaN(value)) {
-                    digit.push(prevDigit.toString())
-                } else if (prevDigit != null & !isNaN(value)) {
-                    digit = []
-                    input.textContent = ""
-                }
+            
+        } 
 
-                prevDigit = null
-                digit.push(value)
-
-                input.textContent = digit.join("")
-            }
+        else if(value === "±"){
+            if(currentValue=="0") return
+            currentValue = -1 * parseFloat(currentValue);
         }
-        catch (err) {
-            input.textContent = "Math Error"
-            digit = []
+        
+        else if (value === ".") {
+            if (!currentValue.includes(".")) currentValue += "."
+        } 
+
+        else if(value == "%"){
+            currentValue = (parseFloat(currentValue) / 100).toString()
+        }
+        
+        else if (value === "C") {
+            currentValue = "0";
+            previousValue = null;
+            operator = null;
+            waitingForNextValue = false;
         }
 
+        input.value = currentValue;
+        
     });
 });
